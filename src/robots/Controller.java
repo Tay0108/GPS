@@ -19,7 +19,7 @@ public class Controller implements Initializable {
     private Transmitter transmitterA;
     private Transmitter transmitterB;
     private Transmitter transmitterC;
-    private int robotsCount = 10; // default, for tests
+    private int robotsCount = 30; // default, for tests
     private Robot closestRobotA; // robot closest to transmitter A
     private Robot closestRobotB; // B
     private Robot closestRobotC; // C
@@ -55,6 +55,8 @@ public class Controller implements Initializable {
         int maxY = 480;
         // clear canvas:
         gc.clearRect(minX, minY, maxX, maxY);
+        robots.clear();
+        //gc.fillRect(minX, minY, maxX, maxY);
 
         double x = ThreadLocalRandom.current().nextDouble(minX, maxX + 1);
         double y = ThreadLocalRandom.current().nextDouble(minY, maxY + 1);
@@ -108,16 +110,14 @@ public class Controller implements Initializable {
 
         }
 
-
         // z pozostalych robotow (WHERE type = 0) wybierz losowo jednego i sprawdz czy jest bezpieczny:
         for (Robot current : robots) {
 
-            while (true) { // losuje dopoki nie wylosuje jakiegos nietransmitera
-                ourRobot = robots.get(ThreadLocalRandom.current().nextInt(0, robots.size()));
-                if (ourRobot.getType() != 1) {
-                    ourRobot.setType(2);
-                    break;
-                }
+            // losuje dopoki nie wylosuje jakiegos nietransmitera
+            ourRobot = robots.get(ThreadLocalRandom.current().nextInt(0, robots.size()));
+            if (ourRobot.getType() == 0) {
+                ourRobot.setType(2);
+                break;
             }
         }
         // wyswietl stosowna informacje:
@@ -128,9 +128,20 @@ public class Controller implements Initializable {
     }
 
     private void drawWorld() {
+
+        gc.setFill(Color.BLUEVIOLET);
+        gc.fillRect(transmitterA.getX(),transmitterA.getY(), 10, 10);
+        gc.fillRect(transmitterB.getX(),transmitterB.getY(), 10, 10);
+        gc.fillRect(transmitterC.getX(),transmitterC.getY(), 10, 10);
         for (Robot current : robots) {
-            gc.setFill(Color.GREEN);
-            gc.fillOval(current.getX(), current.getY(), 10, 10);
+            if (current.getType() == 0) {
+                gc.setFill(Color.GREEN);
+            } else if (current.getType() == 1) {
+                gc.setFill(Color.RED);
+            } else if (current.getType() == 2) {
+                gc.setFill(Color.YELLOW);
+            }
+            gc.fillOval(current.getX(), current.getY(), 8, 8);
         }
     }
 
