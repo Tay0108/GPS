@@ -35,7 +35,8 @@ public class Controller implements Initializable {
 
     /*
     Łączysz P z wierzchołkami A, B i C. Liczysz pole trójkąta ABC i pola małych trójkątów ABP, BCP i ACP.
-    Jeśli suma pól małych trójkątów jest równa polu trójkąta ABC to P jest wewnątrz niego. Uwaga - pamietaj o przyblizeniu, trojkaty pewnie nie beda dokladnie identyczne
+    Jeśli suma pól małych trójkątów jest równa polu trójkąta ABC to P jest wewnątrz niego. Uwaga - pamietaj o przyblizeniu,
+    trojkaty pewnie nie beda dokladnie identyczne
 
      */
 
