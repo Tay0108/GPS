@@ -41,7 +41,7 @@
                </VBox.margin></Pane>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <Text layoutX="8.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="info" text="Komunikat:" />
+                  <Text fx:id="message" layoutX="8.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="info" text="Komunikat:" />
                </children>
             </Pane>
          </children>
@@ -66,6 +66,8 @@
                         <Font size="17.0" />
                      </font>
                   </Text>
+                  <Label text="Robots:" textFill="#b4b4b4" />
+                  <TextField fx:id="robotsCountText" maxWidth="75.0" minWidth="75.0" prefHeight="0.0" prefWidth="75.0" />
                </children></VBox>
             <VBox maxHeight="200.0" maxWidth="280.0" minHeight="200.0" minWidth="280.0" prefHeight="200.0" prefWidth="280.0" styleClass="legend">
                <VBox.margin>
@@ -84,7 +86,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Circle fill="GREEN" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Text  styleClass="legend-title" strokeType="OUTSIDE" strokeWidth="0.0" text=" - Robot">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="legend-title" text=" - Robot">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -94,7 +96,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Circle fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Text  styleClass="legend-title" strokeType="OUTSIDE" strokeWidth="0.0" text=" - Closest robots">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="legend-title" text=" - Closest robots">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -104,7 +106,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Circle fill="YELLOW" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Text styleClass="legend-title" strokeType="OUTSIDE" strokeWidth="0.0" text=" - Our robot">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="legend-title" text=" - Our robot">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -114,7 +116,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Circle fill="BLUEVIOLET" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Text styleClass="legend-title" strokeType="OUTSIDE" strokeWidth="0.0" text=" - Transmitter">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="legend-title" text=" - Transmitter">
                            <font>
                               <Font size="20.0" />
                            </font>

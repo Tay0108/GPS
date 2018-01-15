@@ -4,7 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -24,46 +26,51 @@ public class Controller implements Initializable {
     private Robot closestRobotC; // C
     private Robot ourRobot;
 
-    private int robotsCount = 500; // default, for tests
+    private int robotsCount;
     private int robotRadius = 8;
     private int transmitterRadius = 10;
+
+    @FXML
+    TextField robotsCountText;
+
+    @FXML
+    private Text message;
 
     @FXML
     private Canvas coordinateSystem;
 
     private GraphicsContext gc;
 
-    /*
-    Łączysz P z wierzchołkami A, B i C. Liczysz pole trójkąta ABC i pola małych trójkątów ABP, BCP i ACP.
-    Jeśli suma pól małych trójkątów jest równa polu trójkąta ABC to P jest wewnątrz niego. Uwaga - pamietaj o przyblizeniu,
-    trojkaty pewnie nie beda dokladnie identyczne
-
-     */
-
-    private int triangleArea(int edge1, int edge2, int edge3) {
+    private double triangleArea(double edge1, double edge2, double edge3) {
         double p = (edge1 + edge2 + edge3) / 2; // polowa obwodu
-        return (int) Math.sqrt(p * (p - edge1) * (p - edge2) * (p - edge3));
+        return Math.sqrt(p * (p - edge1) * (p - edge2) * (p - edge3));
     }
 
     private boolean isRobotSafe(Robot robot) {
-        int AB = (int) Math.sqrt(Math.pow(transmitterA.getX() - transmitterB.getX(), 2) + Math.pow(transmitterA.getY() - transmitterB.getY(), 2));
-        int AC = (int) Math.sqrt(Math.pow(transmitterA.getX() - transmitterC.getX(), 2) + Math.pow(transmitterA.getY() - transmitterC.getY(), 2));
-        int BC = (int) Math.sqrt(Math.pow(transmitterB.getX() - transmitterC.getX(), 2) + Math.pow(transmitterB.getY() - transmitterC.getY(), 2));
-        int PA = (int) Math.sqrt(Math.pow(robot.getX() - transmitterA.getX(), 2) + Math.pow(robot.getY() - transmitterA.getY(), 2));
-        int PB = (int) Math.sqrt(Math.pow(robot.getX() - transmitterB.getX(), 2) + Math.pow(robot.getY() - transmitterB.getY(), 2));
-        int PC = (int) Math.sqrt(Math.pow(robot.getX() - transmitterC.getX(), 2) + Math.pow(robot.getY() - transmitterC.getY(), 2));
-        int realTriangleArea = triangleArea(AB, AC, BC);
+        double AB = Math.sqrt(Math.pow(transmitterA.getX() - transmitterB.getX(), 2) + Math.pow(transmitterA.getY() - transmitterB.getY(), 2));
+        double AC = Math.sqrt(Math.pow(transmitterA.getX() - transmitterC.getX(), 2) + Math.pow(transmitterA.getY() - transmitterC.getY(), 2));
+        double BC = Math.sqrt(Math.pow(transmitterB.getX() - transmitterC.getX(), 2) + Math.pow(transmitterB.getY() - transmitterC.getY(), 2));
+        double PA = Math.sqrt(Math.pow(robot.getX() - transmitterA.getX(), 2) + Math.pow(robot.getY() - transmitterA.getY(), 2));
+        double PB = Math.sqrt(Math.pow(robot.getX() - transmitterB.getX(), 2) + Math.pow(robot.getY() - transmitterB.getY(), 2));
+        double PC = Math.sqrt(Math.pow(robot.getX() - transmitterC.getX(), 2) + Math.pow(robot.getY() - transmitterC.getY(), 2));
+        double realTriangleArea = triangleArea(AB, AC, BC);
 
-        int smallTriangle1 = triangleArea(AB, PA, PB);
-        int smallTriangle2 = triangleArea(AC, PA, PC);
-        int smallTriangle3 = triangleArea(BC, PB, PC);
+        double smallTriangle1 = triangleArea(AB, PA, PB);
+        double smallTriangle2 = triangleArea(AC, PA, PC);
+        double smallTriangle3 = triangleArea(BC, PB, PC);
 
         return Math.abs(realTriangleArea - (smallTriangle1 + smallTriangle2 + smallTriangle3)) < 100;
     }
 
     private boolean isRobotRelativelySafe(Robot ourRobot) {
+        // pierwszy pomysł - pola trójkątów
+        /*
+            Łączysz P z wierzchołkami A, B i C. Liczysz pole trójkąta ABC i pola małych trójkątów ABP, BCP i ACP.
+            Jeśli suma pól małych trójkątów jest równa polu trójkąta ABC to P jest wewnątrz niego. Uwaga - pamietaj o przyblizeniu,
+            trojkaty pewnie nie beda dokladnie identyczne
+         */
         // usrednianie bokow
-        int AB = (closestRobotA.getDistanceB() + closestRobotB.getDistanceA()) / 2;
+       /* int AB = (closestRobotA.getDistanceB() + closestRobotB.getDistanceA()) / 2;
         int AC = (closestRobotA.getDistanceC() + closestRobotC.getDistanceA()) / 2;
         int BC = (closestRobotB.getDistanceC() + closestRobotC.getDistanceB()) / 2;
 
@@ -75,11 +82,91 @@ public class Controller implements Initializable {
         System.out.println(smallTriangle1);
         System.out.println(smallTriangle2);
         System.out.println(smallTriangle3);
-        return Math.abs(bigTriangle - (smallTriangle1 + smallTriangle2 + smallTriangle3)) < 0.1 * bigTriangle; // tolerancja
+        return Math.abs(bigTriangle - (smallTriangle1 + smallTriangle2 + smallTriangle3)) < 0; // tolerancja*/
+
+        // nowy pomysl, z ukladem wspolrzednych:
+        // usadawiamy dwa punkty na osi OX:
+        double Ax = 0;
+        double Ay = 0;
+
+        double Bx = closestRobotB.getDistanceA();
+        double By = 0;
+
+        double Cx; // punkt nieznany, jego wspolrzedne musimy wyliczyć znając pozycje dwóch pozostałych, oraz mając przybliżone długości boków trójkąta
+        double Cy;
+
+        double ac = closestRobotC.getDistanceA();
+        double bc = closestRobotC.getDistanceB();
+        double ab = closestRobotB.getDistanceA();
+
+        // dwa równania odległości - od punktu A i B.
+
+        Cx = (ac * ac - bc * bc - ab * ab) / (-2 * ab);
+
+        Cy = Math.sqrt(Math.abs(ac * ac - Cx * Cx)); // TODO abs
+
+        // okrąg A: x^2+y^2 = ourRobot.getDistanceA^2;
+        // okrąg B: (x-1)^2 +y^2 = ourRobot.getDistanceB^2;
+        // okrąg C: (x-Cx)^2+(y-Cy)^2 = ourRobot.getDistanceC^2;
+
+
+        // mamy juz wszystkie wspolrzedne trojkąta. Teraz triangulacją wyliczamy współrzędne naszego robota:
+
+        double a = ourRobot.getDistanceA();
+        double b = ourRobot.getDistanceB();
+        double c = ourRobot.getDistanceC();
+
+        System.out.println("|PA|: " + a);
+        System.out.println("|PB|: " + b);
+        System.out.println("|PC|: " + c);
+        System.out.println("|AB|: " + ab);
+        System.out.println("|AC|: " + ac);
+        System.out.println("|BC|: " + bc);
+
+
+        double Px = (a * a - b * b + ab * ab) / (2 * ab); // wspolrzedne naszego robota
+        double Py = Math.sqrt(Math.abs(a * a - Px * Px)); // TODO abs
+
+        // mamy juz wszystkie potrzebne punkty:
+
+        System.out.println("A: " + Ax + " " + Ay);
+        System.out.println("B: " + Bx + " " + By);
+        System.out.println("C: " + Cx + " " + Cy);
+        System.out.println("P: " + Px + " " + Py);
+
+        // Sprawdzenie, czy punkt P jest w trójkącie:
+
+        // wyznaczam proste, na ktorych lezy trójkąt (wyznaczyłem na kartce):
+        /*
+
+
+            trzy wyrazenia, którym sprawdzam znaki (http://www.math.us.edu.pl/pgladki/faq/node105.html):
+
+         */
+
+        double Ap = Ay - By;
+        double Bp = Bx - Ax;
+        double Cp = -Ay * Bx + Ax * Ay + By * Ax - Ay * Ax;
+
+        double Aq = Ay - Cy;
+        double Bq = Cx - Ax;
+        double Cq = -Ay * Cx + Ax * Ay + Cy * Ay - Ay * Ax;
+
+        double Ar = By - Cy;
+        double Br = Cx - Bx;
+        double Cr = -By * Cx + Bx * By + Cy * Bx - By * Bx;
+
+        if ((Ap * Cx + Bp * Cy + Cp) * (Ap * Px + Bp * Py + Cp) >= 0 && (Aq * Bx + Bq * By + Cq) * (Aq * Px + Bq * Py + Cq) >= 0 && (Ar * Ax + Br * Ay + Cr) * (Ar * Px + Br * Py + Cr) >= 0) {
+            return true;
+        }
+        return false;
+
     }
 
     @FXML
     private void generateWorld() {
+        robotsCount = Integer.parseInt(robotsCountText.getText());
+        message.setText("");
         // umiesc anteny w trzech losowych miejscach plaszczyzny:
 
         int minX = 0;
@@ -111,9 +198,9 @@ public class Controller implements Initializable {
             x = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
             y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
 
-            int distanceA = (int) Math.sqrt(Math.pow(transmitterA.getX() - x, 2) + Math.pow(transmitterA.getY() - y, 2));
-            int distanceB = (int) Math.sqrt(Math.pow(transmitterB.getX() - x, 2) + Math.pow(transmitterB.getY() - y, 2));
-            int distanceC = (int) Math.sqrt(Math.pow(transmitterC.getX() - x, 2) + Math.pow(transmitterC.getY() - y, 2));
+            double distanceA = Math.sqrt(Math.pow(transmitterA.getX() - x, 2) + Math.pow(transmitterA.getY() - y, 2));
+            double distanceB = Math.sqrt(Math.pow(transmitterB.getX() - x, 2) + Math.pow(transmitterB.getY() - y, 2));
+            double distanceC = Math.sqrt(Math.pow(transmitterC.getX() - x, 2) + Math.pow(transmitterC.getY() - y, 2));
 
             robots.add(new Robot(x, y, distanceA, distanceB, distanceC));
         }
@@ -157,18 +244,29 @@ public class Controller implements Initializable {
         //if (isRobotSafe(ourRobot)) {
         //    System.out.println("Robot jest bezpieczny.");
         //}
-        if (isRobotRelativelySafe(ourRobot)) {
+        /*if (isRobotRelativelySafe(ourRobot)) {
             if (isRobotSafe(ourRobot)) {
+                message.setText("Komunikat: Robot jest bezpieczny.");
                 System.out.println("Robot jest bezpieczny.");
             } else {
+                message.setText("Komunikat: Robot jest względnie bezpieczny, ale tak naprawdę to nie.");
                 System.out.println("Robot jest względnie bezpieczny, ale tak naprawdę to nie.");
             }
         } else {
+            message.setText("Komunikat: Robot jest w niebezpieczeństwie.");
             System.out.println("Robot jest w niebezpieczeństwie.");
         }
+*/
+        if (isRobotSafe(ourRobot)) {
+            message.setText("Komunikat: Robot jest bezpieczny.");
+            System.out.println("Robot jest bezpieczny.");
+        } else {
+            message.setText("Komunikat: Robot jest w niebezpieczeństwie.");
+            System.out.println("Robot jest w niebezpieczeństwie.");
+        }
+
         drawWorld();
     }
-
 
     private void drawWorld() {
 
@@ -202,6 +300,6 @@ public class Controller implements Initializable {
     @FXML
     public void initialize(URL url, ResourceBundle rb) {
         gc = coordinateSystem.getGraphicsContext2D();
+        robotsCountText.setText("500");
     }
-
 }

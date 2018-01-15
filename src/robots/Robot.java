@@ -4,15 +4,15 @@ public class Robot {
     private double signalA;
     private double signalB;
     private double signalC;
-    private int distanceA;
-    private int distanceB;
-    private int distanceC;
-    private int x;
-    private int y;
+    private double distanceA;
+    private double distanceB;
+    private double distanceC;
+    private double x;
+    private double y;
 
     private int type; // 0 basic 1 'satelite' 2 'our' robot
 
-    Robot(int x, int y, int distanceA, int distanceB, int distanceC) {
+    Robot(double x, double y, double distanceA, double distanceB, double distanceC) {
         this.distanceA = distanceA;
         this.distanceB = distanceB;
         this.distanceC = distanceC;
@@ -43,31 +43,31 @@ public class Robot {
         return signalC;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 
-    public int getDistanceA() {
+    public double getDistanceA() {
         return distanceA;
     }
 
-    public int getDistanceB() {
+    public double getDistanceB() {
         return distanceB;
     }
 
-    public int getDistanceC() {
+    public double getDistanceC() {
         return distanceC;
     }
 }
