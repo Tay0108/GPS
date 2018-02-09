@@ -1,3 +1,5 @@
+// nothing special
+
 package robots;
 
 public class Robot {
